@@ -1,22 +1,26 @@
 package com.ssafy.edu.model.board;
 
 import lombok.*;
+
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 /*
-* 특정 공지사항 조회 - 댓글 객체
+* 전체 공지사항 조회
+* 응답 객체
 * */
 
+@Valid
+@ToString
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BoardCommentResponse {
-
-    Long commentId;
-    String content;
+public class BoardResponse {
+    Long boardId;
+    String title;
     String email;
+    Long views;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-
 }

@@ -2,7 +2,7 @@ package com.ssafy.edu.model.board;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public class BoardResponse {
+public class BoardBasicResponse {
 
     @ApiModelProperty(value = "status", position = 1)
     public boolean status;

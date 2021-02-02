@@ -1,19 +1,27 @@
 package com.ssafy.edu.model.board;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+/*
+* 특정 공지사항 조회 
+* 응답 객체
+* */
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
-public class BoardResult {
+public class BoardOneResult {
 
-    Long id;
+    Long boardId;
     String email;
     String title;
     String content;
+    Long views;
     LocalDateTime createdDate;
     LocalDateTime updatedDate;
     List<BoardCommentResponse> boardCommentList;
