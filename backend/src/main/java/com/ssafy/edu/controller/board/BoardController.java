@@ -1,4 +1,4 @@
-package com.ssafy.edu.controller.user;
+package com.ssafy.edu.controller.board;
 
 import com.ssafy.edu.model.BasicResponse;
 import com.ssafy.edu.model.board.*;
@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@ApiResponses(value = {@ApiResponse(code = 401, message = "Unauthorized", response = BoardResponse.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = BoardResponse.class),
-        @ApiResponse(code = 404, message = "Not Found", response = BoardResponse.class),
-        @ApiResponse(code = 500, message = "Failure", response = BoardResponse.class)})
+@ApiResponses(value = {@ApiResponse(code = 401, message = "Unauthorized", response = BoardBasicResponse.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = BoardBasicResponse.class),
+        @ApiResponse(code = 404, message = "Not Found", response = BoardBasicResponse.class),
+        @ApiResponse(code = 500, message = "Failure", response = BoardBasicResponse.class)})
 
 @CrossOrigin(origins = {"http://localhost:3000"})
 @RestController
@@ -29,31 +29,31 @@ public class BoardController {
 
     @ApiOperation(value = "공지사항 전체 조회", notes = "데이터베이스에 저장된 모든 게시글을 불러옵니다.")
     @GetMapping
-    public ResponseEntity<BoardResponse> getBoardList(){
+    public ResponseEntity<BoardBasicResponse> getBoardList(){
         return boardService.getBoardList();
     }
 
     @ApiOperation(value = "공지사항 조회", notes = "{boardId}번 게시글과 댓글들을 불러옵니다.")
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardResponse> getBoard(@PathVariable("boardId") Long id){
+    public ResponseEntity<BoardBasicResponse> getBoard(@PathVariable("boardId") Long id){
         return boardService.getBoard(id);
     }
 
     @ApiOperation(value = "공지사항 등록", notes = "작성한 게시글이 데이터베이스에 저장됩니다.")
     @PostMapping
-    public ResponseEntity<BoardResponse> insertBoard(@RequestBody BoardRequest boardInsertRequest){
+    public ResponseEntity<BoardBasicResponse> insertBoard(@RequestBody BoardRequest boardInsertRequest){
         return boardService.insertBoard(boardInsertRequest);
     }
 
     @ApiOperation(value = "공지사항 수정", notes = "{boardId}번째 게시글을 수정합니다.")
     @PutMapping("/{boardId}")
-    public ResponseEntity<BoardResponse> updateBoard(@PathVariable("boardId") Long id, @RequestBody BoardUpdateRequest boardUpdateRequest){
+    public ResponseEntity<BoardBasicResponse> updateBoard(@PathVariable("boardId") Long id, @RequestBody BoardUpdateRequest boardUpdateRequest){
         return boardService.updateBoard(id, boardUpdateRequest);
     }
 
     @ApiOperation(value = "공지사항 삭제", notes = "{boardId}번째 게시글을 삭제합니다.")
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<BoardResponse> deleteBoard(@PathVariable("boardId") Long id){
+    public ResponseEntity<BoardBasicResponse> deleteBoard(@PathVariable("boardId") Long id){
         return boardService.deleteBoard(id);
     }
 
@@ -71,14 +71,8 @@ public class BoardController {
 
     @ApiOperation(value = "댓글 삭제", notes = "{boardId}번째 게시글에 있는 {commentId}번 댓글을 삭제합니다.")
     @DeleteMapping("/{boardId}/comments/{commentId}")
-    public ResponseEntity<BasicResponse> deleteComment(@PathVariable("id") Long id,@PathVariable("cid") Long cid){
+    public ResponseEntity<BasicResponse> deleteComment(@PathVariable("boardId") Long id,@PathVariable("commentId") Long cid){
         return boardCommentService.deleteComment(id, cid);
-    }
-
-    @ApiOperation(value = "id번 게시글 좋아요 등록/취소", notes = "{id}번째 게시글에 사용자 {email}이 좋아요 등록/취소 합니다.")
-    @PutMapping("/{id}/likes/{email}")
-    public ResponseEntity<BoardResponse> likeButton(@PathVariable("id") Long id, @PathVariable("email") String email){
-        return boardService.likeBoard(id, email);
     }
 
 }
