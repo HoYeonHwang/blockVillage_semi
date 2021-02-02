@@ -32,43 +32,28 @@ public class BoardServiceImpl implements BoardService{
         BoardBasicResponse result = new BoardBasicResponse();
 
         List<Board> boardList = boardJpaRepository.findAll();
-        
-        if(boardList.get(0)!=null){
-            System.out.println("boardList는 널아님");
-        }
-        
-//        List<BoardResult> resultList = boardList.stream().map(boardEntity -> {
-//            BoardResult boardResult = new BoardResult();
-//            boardResult.setId(boardEntity.getId());
-//            boardResult.setTitle(boardEntity.getTitle());
-//            boardResult.setContent(boardEntity.getContent());
-////            boardResult.setWriter(boardEntity.getUser().getNickname());
-//            if(boardEntity.getUser()!=null){
-//                System.out.println("이새기 널아님");
-//                System.out.println(boardEntity.getUser().getNickname());
-//            }else{
-//                System.out.println("이새기 널임");
-//            }
-//            return boardResult;
-//        }).collect(Collectors.toList());
 
-//        List<BoardOneResult> resultList = new ArrayList<>();
-//        for(Board br : boardList){
-//            BoardOneResult boardResult = new BoardOneResult();
-//            boardResult.setId(br.getId());
-//            boardResult.setTitle(br.getTitle());
-//            boardResult.setContent(br.getContent());
-//            boardResult.setWriter(br.getUser().getNickname());
-//            System.out.println("br.getUser().toString() = " + br.getUser().toString());
-//        resultList.add(boardResult);
-//        }
-        
-//        if(resultList.get(0)!=null){
-//            System.out.println("resultList 널아님");
-//        }
-        
-        result.status = true;
-//        result.data = resultList;
+        if(!boardList.isEmpty()){ // 공지사항이 게시글이 있는 경우
+
+            List<BoardResponse> boardResponseList = new ArrayList<>();
+            for(Board b : boardList){
+                BoardResponse br = new BoardResponse();
+                br.setBoardId(b.getBoardId());
+                br.setTitle(b.getTitle());
+                br.setEmail(b.getUser().getEmail());
+                br.setViews(b.getViews());
+                br.setCreatedAt(b.getCreatedDate());
+                br.setUpdatedAt(b.getModifiedDate());
+                boardResponseList.add(br);
+            }
+
+            result.status = true;
+            result.data = boardResponseList;
+            return new ResponseEntity<>(result, HttpStatus.OK);
+
+        }
+
+        result.status = false;
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -82,6 +67,10 @@ public class BoardServiceImpl implements BoardService{
         if(boardOptional.isPresent()){
 
             Board board = boardOptional.get();
+
+            // 조회수 증가 처리
+            board.setViews(board.getViews()+1L);
+            boardJpaRepository.save(board);
 
             BoardOneResult boardOne = new BoardOneResult();
             boardOne.setBoardId(board.getBoardId());
@@ -104,7 +93,7 @@ public class BoardServiceImpl implements BoardService{
                 bCommentList.add(bc);
             }
 
-            boardOne.setBoardCommentList(bCommentList);
+            boardOne.setComments(bCommentList);
 
             result.status = true;
             result.data = boardOne;
