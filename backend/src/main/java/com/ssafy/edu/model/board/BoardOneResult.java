@@ -9,11 +9,13 @@ import java.util.List;
 @Getter
 @Setter
 public class BoardResult {
+
     Long id;
+    String email;
     String title;
     String content;
-    String writer;
     LocalDateTime createdDate;
     LocalDateTime updatedDate;
     List<BoardCommentResponse> boardCommentList;
+
 }
