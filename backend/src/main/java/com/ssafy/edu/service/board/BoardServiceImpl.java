@@ -5,14 +5,21 @@ import com.ssafy.edu.model.user.User;
 import com.ssafy.edu.repository.BoardCommentJpaRepository;
 import com.ssafy.edu.repository.BoardJpaRepository;
 import com.ssafy.edu.repository.UserJpaRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class BoardServiceImpl implements BoardService{
@@ -27,16 +34,16 @@ public class BoardServiceImpl implements BoardService{
     private BoardCommentJpaRepository boardCommentJpaRepository;
 
     @Override
-    public ResponseEntity<BoardBasicResponse> getBoardList() {
+    public ResponseEntity<BoardBasicResponse> getBoardList(Pageable pageable) {
 
         BoardBasicResponse result = new BoardBasicResponse();
+        Page<Board> page = boardJpaRepository.findAll(pageable);
 
-        List<Board> boardList = boardJpaRepository.findAll();
-
-        if(!boardList.isEmpty()){ // 공지사항이 게시글이 있는 경우
+        if(!page.isEmpty()){
 
             List<BoardResponse> boardResponseList = new ArrayList<>();
-            for(Board b : boardList){
+
+            for(Board b : page){
                 BoardResponse br = new BoardResponse();
                 br.setBoardId(b.getBoardId());
                 br.setTitle(b.getTitle());
@@ -55,7 +62,56 @@ public class BoardServiceImpl implements BoardService{
 
         result.status = false;
         return new ResponseEntity<>(result, HttpStatus.OK);
+
     }
+
+    @Override
+    public ResponseEntity<BoardBasicResponse> getBoardList(final Pageable pageable, String keywordType, String keyword) {
+
+        BoardBasicResponse result = new BoardBasicResponse();
+
+        if(keywordType.equals("title")){
+            Page<Board> page = boardJpaRepository.findByTitleContaining(pageable, keyword);
+            return makeBoardResponse(page);
+        }else if(keywordType.equals("content")){
+            Page<Board> page = boardJpaRepository.findByContentContaining(pageable, keyword);
+            return makeBoardResponse(page);
+        }
+
+        result.status = false;
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    private ResponseEntity<BoardBasicResponse> makeBoardResponse(Page<Board> page) {
+
+        BoardBasicResponse result = new BoardBasicResponse();
+
+        if(!page.isEmpty()){
+
+            List<BoardResponse> boardResponseList = new ArrayList<>();
+
+            for(Board b : page){
+                BoardResponse br = new BoardResponse();
+                br.setBoardId(b.getBoardId());
+                br.setTitle(b.getTitle());
+                br.setEmail(b.getUser().getEmail());
+                br.setViews(b.getViews());
+                br.setCreatedAt(b.getCreatedDate());
+                br.setUpdatedAt(b.getModifiedDate());
+                boardResponseList.add(br);
+            }
+
+            result.status = true;
+            result.data = boardResponseList;
+            return new ResponseEntity<>(result, HttpStatus.OK);
+
+        }
+
+        result.status = false;
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
+
 
     /* 공지사항 조회 */
     @Override
@@ -128,7 +184,7 @@ public class BoardServiceImpl implements BoardService{
                     .title(save.getTitle())
                     .email(save.getUser().getEmail())
                     .views(save.getViews())
-                    .createdAt(save.getCreatedDate())           // null에 대한 위험성?
+                    .createdAt(save.getCreatedDate())
                     .updatedAt(save.getModifiedDate())
                     .build();
 
@@ -160,9 +216,9 @@ public class BoardServiceImpl implements BoardService{
             BoardResponse br = BoardResponse.builder()
                     .boardId(save.getBoardId())
                     .title(save.getTitle())
-                    .email(save.getUser().getEmail())        // user_pk?
+                    .email(save.getUser().getEmail())
                     .views(save.getViews())
-                    .createdAt(save.getCreatedDate())       // null에 대한 위험성?
+                    .createdAt(save.getCreatedDate())
                     .updatedAt(save.getModifiedDate())
                     .build();
 

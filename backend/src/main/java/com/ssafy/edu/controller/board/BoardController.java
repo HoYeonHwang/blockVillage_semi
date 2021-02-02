@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +31,13 @@ public class BoardController {
 
     @ApiOperation(value = "공지사항 전체 조회", notes = "데이터베이스에 저장된 모든 게시글을 불러옵니다.")
     @GetMapping
-    public ResponseEntity<BoardBasicResponse> getBoardList(){
-        return boardService.getBoardList();
+    public ResponseEntity<BoardBasicResponse> getBoardList(@PageableDefault(size=5, sort="createdDate") final Pageable pageable,
+                                                           @RequestParam(value = "keywordType", required = false) String keywordType,
+                                                           @RequestParam(value = "keyword", required = false) String keyword){
+        if(keywordType!=null && keyword!=null){
+            return boardService.getBoardList(pageable, keywordType, keyword);
+        }
+        return boardService.getBoardList(pageable);
     }
 
     @ApiOperation(value = "공지사항 조회", notes = "{boardId}번 게시글과 댓글들을 불러옵니다.")
