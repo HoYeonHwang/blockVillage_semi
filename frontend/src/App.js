@@ -1,23 +1,70 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { Route, Switch, useHistory } from 'react-router-dom';
+
+import styles from './App.module.css';
+
+import MissionMain from './components/blockly/mission/mission_main/mission_main';
+import TutorialMain from './components/blockly/tutorial/tutorial_main/tutorial_main';
+import Main from './components/main/main/main';
+import MissionMaze from './components/blockly/mission_maze/mission_maze';
+import BlockStoreContainer from './containers/block_store_container';
+import ChallengeContainer from './containers/challenge_container';
+
+
+import MyPageContainer from './containers/my_page_container';
+
+import SubMain from './components/main/sub_main/sub_main';
+import TestMypage from './components/my_page/test_mypage';
+
+
 
 function App() {
+  // const history = useHistory();
+
+  // useEffect(() => {
+  //   history.push('/main')
+  // })
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={styles.app}>
+
+      <Switch>
+        <Route exact path="/">
+          <SubMain />
+        </Route>
+        
+        <Route exact path="/my_page">
+          <TestMypage />
+          {/* <MyPageContainer /> */}
+        </Route>
+
+        <Route exact path="/main">
+          <Main />
+        </Route>
+
+        <Route exact path="/main/tutorial_main">
+          <TutorialMain />
+        </Route>
+
+
+        <Route exact path="/main/mission_main">
+          <MissionMain />
+        </Route>
+
+
+        <Route exact path="/main/challenge_main">
+          <ChallengeContainer />
+        </Route>
+
+        <Route exact path="/main/block_store">
+          <BlockStoreContainer />
+        </Route>
+
+        <Route exact path="/main/mission_main/maze_1">
+          <MissionMaze />
+        </Route>
+
+      </Switch>
     </div>
   );
 }
